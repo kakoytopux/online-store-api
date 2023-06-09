@@ -1,11 +1,11 @@
-from utils.db import setDataDb
+from middlewares.db import set_data_db
 
 class User():
-  def create_user(name, surname, age, email, password):
-    query_create_user = "INSERT INTO users (name, surname, age, email, password) VALUES ('%s', '%s', %d, '%s', '%s')" % (name, surname, age, email, password)
-    res = setDataDb(query_create_user)
-
-    # query_select_user = "SELECT id FROM users WHERE id = %s" % (id)
-    # res = setDataDb(query_select_user)
+  def insert_user(name, surname, age, email, password):
+    query_create_user = """
+    INSERT INTO users (name, surname, age, email, password) VALUES ('%s', '%s', %d, '%s', '%s')
+    """ % (name, surname, age, email, password)
+    
+    res = set_data_db(query_create_user)
 
     return res
