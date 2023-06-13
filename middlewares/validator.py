@@ -6,3 +6,7 @@ class CreateUser(BaseModel):
   age: int = Field(gt=13, lt=100)
   email: EmailStr
   password: constr(min_length=5)
+
+class AuthUser(BaseModel):
+  email: EmailStr
+  password: str
