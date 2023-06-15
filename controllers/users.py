@@ -1,6 +1,7 @@
 from operator import attrgetter
 from models.user import User
 from middlewares.db import db
+from sqlalchemy import select
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
@@ -18,6 +19,7 @@ def create_user(user):
 
     session.add(new_user)
     session.commit()
+
     session.refresh(new_user)
     session.close()
 
@@ -32,4 +34,18 @@ def create_user(user):
     if(err.code == '9h9h'):
       raise HTTPException(detail={ 'message': 'Введены некорректные данные.' }, status_code=400)
     
+    raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
+  
+def get_info_user(req):
+  session = db.get_session()
+  user = req.state.user
+
+  try:
+    get_user = select(User).where(User.email == user['email'])
+
+    for user_obj in session.scalars(get_user):
+      json_res = jsonable_encoder(user_obj)
+
+      return JSONResponse(content={ 'user': json_res })
+  except:
     raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)

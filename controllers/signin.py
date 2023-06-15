@@ -24,7 +24,7 @@ def auth_user(user):
       token = jwt.encode({ 'email': user_obj.email }, 'secret-dev', algorithm='HS256')
       
       res = JSONResponse(content='')
-      res.set_cookie(key='token', value=token)
+      res.set_cookie(key='token', value=token, expires=604800)
 
       return res
     else:
