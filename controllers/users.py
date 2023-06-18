@@ -1,7 +1,7 @@
 from operator import attrgetter
 from models.user import User
 from middlewares.db import db
-from sqlalchemy import select
+from sqlalchemy import select, update
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
@@ -15,15 +15,15 @@ def create_user(user):
   hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
   
   try:
-    new_user = User(name=name, surname=surname, age=age, email=email, password=hash)
+    sql = User(name=name, surname=surname, age=age, email=email, password=hash)
 
-    session.add(new_user)
+    session.add(sql)
     session.commit()
 
-    session.refresh(new_user)
+    session.refresh(sql)
     session.close()
 
-    json_res = jsonable_encoder(new_user)
+    json_res = jsonable_encoder(sql)
 
     del json_res['password']
 
@@ -36,16 +36,36 @@ def create_user(user):
     
     raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
   
-def get_info_user(req):
+def get_user_info(req):
   session = db.get_session()
-  user = req.state.user
-
+  
   try:
-    get_user = select(User).where(User.email == user['email'])
-
-    for user_obj in session.scalars(get_user):
+    for user_obj in session.scalars(select(User).where(User.email == req.state.user['email'])):
       json_res = jsonable_encoder(user_obj)
 
+      del json_res['password']
+
       return JSONResponse(content={ 'user': json_res })
+    
+    session.close()
+  except:
+    raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
+  
+def get_user_changed(req, user):
+  session = db.get_session()
+
+  data_obj = {}
+
+  for key, value in user:
+    if value:
+      data_obj[key] = value 
+
+  try:
+    sql = update(User).where(User.email == req.state.user['email']).values(data_obj)
+
+    session.execute(sql)
+    session.commit()
+
+    return JSONResponse(content={ 'user': 'ok' })
   except:
     raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
