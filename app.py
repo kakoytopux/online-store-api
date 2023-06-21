@@ -4,9 +4,12 @@ from controllers.users import create_user
 from controllers.signin import auth_user
 from middlewares.validator import CreateUser, AuthUser
 from middlewares.auth import auth
+from dotenv import load_dotenv
 import uvicorn
 
 app = FastAPI()
+
+load_dotenv()
 
 @app.post('/signup')
 def get_create_user(user: CreateUser):

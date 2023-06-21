@@ -1,21 +1,29 @@
 from operator import attrgetter
 from models.user import User
 from middlewares.db import db
-from sqlalchemy import select, update
+from sqlalchemy import update
 from sqlalchemy.exc import SQLAlchemyError
 from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 from fastapi.encoders import jsonable_encoder
 import bcrypt
 
+def get_data(data):
+  data_obj = {}
+
+  for key, value in data:
+    if value:
+      data_obj[key] = value
+  
+  return data_obj
+
 def create_user(user):
   session = db.get_session()
-  name, surname, age, email, password = attrgetter('name', 'surname', 'age', 'email', 'password')(user)
-
-  hash = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+  data_obj = get_data(user)
   
   try:
-    sql = User(name=name, surname=surname, age=age, email=email, password=hash)
+    data_obj['password'] = bcrypt.hashpw(data_obj['password'].encode('utf-8'), bcrypt.gensalt())
+    sql = User(data_obj)
 
     session.add(sql)
     session.commit()
@@ -40,32 +48,36 @@ def get_user_info(req):
   session = db.get_session()
   
   try:
-    for user_obj in session.scalars(select(User).where(User.email == req.state.user['email'])):
-      json_res = jsonable_encoder(user_obj)
-
-      del json_res['password']
-
-      return JSONResponse(content={ 'user': json_res })
-    
+    user_obj = session.query(User).filter(User.id == req.state.user['id']).first()
     session.close()
+
+    json_res = jsonable_encoder(user_obj)
+
+    del json_res['password']
+
+    return JSONResponse(content={ 'user': json_res })
   except:
     raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
   
 def get_user_changed(req, user):
   session = db.get_session()
 
-  data_obj = {}
-
-  for key, value in user:
-    if value:
-      data_obj[key] = value 
+  data_obj = get_data(user)
 
   try:
-    sql = update(User).where(User.email == req.state.user['email']).values(data_obj)
-
-    session.execute(sql)
+    user_obj = session.query(User).filter(User.id == req.state.user['id']).first()
+    session.execute(update(user_obj).values(data_obj))
     session.commit()
 
-    return JSONResponse(content={ 'user': 'ok' })
-  except:
+    json_res = jsonable_encoder(user_obj)
+
+    del json_res['password']
+
+    return JSONResponse(content={ 'user': json_res })
+  except SQLAlchemyError as err:
+    session.rollback()
+
+    if(err.code == 'gkpj'):
+      raise HTTPException(detail={ 'message': 'Такая почта уже используется.' }, status_code=409)
+    
     raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)

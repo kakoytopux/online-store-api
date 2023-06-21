@@ -6,6 +6,7 @@ from models.user import User
 from middlewares.db import db
 import bcrypt
 import jwt
+import os
 
 def auth_user(user):
   session = db.get_session()
@@ -21,10 +22,10 @@ def auth_user(user):
     password_valid = bcrypt.checkpw(password.encode('utf-8'), user_obj.password.encode('utf-8'))
 
     if password_valid:
-      token = jwt.encode({ 'email': user_obj.email }, 'secret-dev', algorithm='HS256')
+      token = jwt.encode({ 'id': user_obj.id }, os.getenv('SECRET_KEY') if os.getenv('MODE') == 'production' else 'secret-dev', algorithm='HS256')
       
       res = JSONResponse(content='')
-      res.set_cookie(key='token', value=token, expires=604800)
+      res.set_cookie(key='token', value=token, expires=604800, httponly=True)
 
       return res
     else:

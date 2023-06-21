@@ -1,12 +1,13 @@
 from fastapi import HTTPException, Request
 import jwt
+import os
 
-async def auth(req: Request):
+def auth(req: Request):
   token = req.cookies.get('token')
 
   if token:
     try:
-      req.state.user = jwt.decode(token, 'secret-dev', algorithms=['HS256'])
+      req.state.user = jwt.decode(token, os.getenv('SECRET_KEY') if os.getenv('MODE') == 'production' else 'secret-dev', algorithms=['HS256'])
 
       return req
     except:
