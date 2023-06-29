@@ -5,8 +5,8 @@ from middlewares.db import db
 class Base(DeclarativeBase):
   pass
 
-class User(Base):
-  __tablename__ = 'user'
+class Users(Base):
+  __tablename__ = 'users'
 
   id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
   name: Mapped[str] = mapped_column(String(30), nullable=False)

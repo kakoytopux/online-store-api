@@ -1,5 +1,4 @@
-from operator import attrgetter
-from models.user import User
+from models.users import Users
 from middlewares.db import db
 from sqlalchemy import update
 from sqlalchemy.exc import SQLAlchemyError
@@ -20,10 +19,10 @@ def get_data(data):
 def create_user(user):
   session = db.get_session()
   data_obj = get_data(user)
-  
+
   try:
     data_obj['password'] = bcrypt.hashpw(data_obj['password'].encode('utf-8'), bcrypt.gensalt())
-    sql = User(data_obj)
+    sql = Users(**data_obj)
 
     session.add(sql)
     session.commit()
@@ -48,7 +47,7 @@ def get_user_info(req):
   session = db.get_session()
   
   try:
-    user_obj = session.query(User).filter(User.id == req.state.user['id']).first()
+    user_obj = session.query(Users).filter(Users.id == req.state.user['id']).first()
     session.close()
 
     json_res = jsonable_encoder(user_obj)
@@ -59,15 +58,17 @@ def get_user_info(req):
   except:
     raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
   
-def get_user_changed(req, user):
+def change_user(req, user):
   session = db.get_session()
 
   data_obj = get_data(user)
 
   try:
-    user_obj = session.query(User).filter(User.id == req.state.user['id']).first()
-    session.execute(update(user_obj).values(data_obj))
+    session.execute(update(Users).where(Users.id == req.state.user['id']).values(data_obj))
     session.commit()
+
+    user_obj = session.query(Users).filter(Users.id == req.state.user['id']).first()
+    session.close()
 
     json_res = jsonable_encoder(user_obj)
 

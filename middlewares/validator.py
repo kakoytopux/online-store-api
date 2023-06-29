@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field, HttpUrl
 from typing import Optional
 
 class CreateUser(BaseModel):
@@ -16,3 +16,9 @@ class UpdateUser(BaseModel):
   surname: Optional[str] = Field(min_length=2, max_length=30)
   email: Optional[EmailStr]
   password: Optional[str] = Field(min_length=5)
+
+class CreateItem(BaseModel):
+  img_url: HttpUrl
+  name: str = Field(min_length=2, max_length=40)
+  desc: str = Field(min_length=20, max_length=500)
+  tags: list
