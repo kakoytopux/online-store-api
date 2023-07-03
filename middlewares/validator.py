@@ -20,5 +20,11 @@ class UpdateUser(BaseModel):
 class CreateItem(BaseModel):
   img_url: HttpUrl
   name: str = Field(min_length=2, max_length=40)
-  desc: str = Field(min_length=20, max_length=500)
+  desc: str = Field(min_length=20, max_length=1000)
+  tags: list
+
+class EditItem(BaseModel):
+  img_url: HttpUrl
+  name: str = Field(min_length=2, max_length=40)
+  desc: str = Field(min_length=20, max_length=1000)
   tags: list

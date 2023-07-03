@@ -47,7 +47,7 @@ def get_user_info(req):
   session = db.get_session()
   
   try:
-    user_obj = session.query(Users).filter(Users.id == req.state.user['id']).first()
+    user_obj = session.query(Users).get(req.state.user['id'])
     session.close()
 
     json_res = jsonable_encoder(user_obj)
@@ -60,14 +60,13 @@ def get_user_info(req):
   
 def change_user(req, user):
   session = db.get_session()
-
   data_obj = get_data(user)
 
   try:
     session.execute(update(Users).where(Users.id == req.state.user['id']).values(data_obj))
     session.commit()
 
-    user_obj = session.query(Users).filter(Users.id == req.state.user['id']).first()
+    user_obj = session.query(Users).get(req.state.user['id'])
     session.close()
 
     json_res = jsonable_encoder(user_obj)

@@ -23,6 +23,7 @@ def set_like_item(req, id):
 
   try:
     item_obj = session.query(Items).get(id)
+    session.close()
 
     if item_obj == None:
       return JSONResponse(content={ 'message': 'Товар не найден.' }, status_code=404)
@@ -32,10 +33,10 @@ def set_like_item(req, id):
 
     item_obj.likes['users_id'].append(req.state.user['id'])
 
-    json_res = jsonable_encoder(item_obj)
-
     session.execute(update(Items).where(Items.id == id).values(likes=item_obj.likes))
     session.commit()
+
+    json_res = jsonable_encoder(item_obj)
 
     return JSONResponse(content={ 'item': json_res })
   except:
@@ -46,6 +47,7 @@ def delete_like_item(req, id):
 
   try:
     item_obj = session.query(Items).get(id)
+    session.close()
 
     if item_obj == None:
       return JSONResponse(content={ 'message': 'Товар не найден.' }, status_code=404)
@@ -58,10 +60,10 @@ def delete_like_item(req, id):
 
     item_obj.likes['users_id'].remove(req.state.user['id'])
 
-    json_res = jsonable_encoder(item_obj)
-
     session.execute(update(Items).where(Items.id == id).values(likes=item_obj.likes))
     session.commit()
+
+    json_res = jsonable_encoder(item_obj)
 
     return JSONResponse(content={ 'item': json_res })
   except:

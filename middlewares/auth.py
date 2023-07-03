@@ -1,8 +1,8 @@
-from fastapi import HTTPException, Request
+from fastapi import HTTPException
 import jwt
 import os
 
-def auth(req: Request):
+def auth(req):
   token = req.cookies.get('token')
 
   if token:
