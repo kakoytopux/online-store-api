@@ -13,6 +13,6 @@ class Items(Base):
   name: Mapped[str] = mapped_column(String(40), nullable=False)
   desc: Mapped[str] = mapped_column(Text, nullable=False)
   tags: Mapped[str] = mapped_column(String(255), nullable=False)
-  likes: Mapped[str] = mapped_column(JSON, default={})
+  likes: Mapped[str] = mapped_column(JSON, default={ 'users_id': [] })
 
 Base.metadata.create_all(bind=db.get_conn())
