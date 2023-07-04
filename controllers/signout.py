@@ -1,7 +1,7 @@
-from fastapi import HTTPException, Request
+from fastapi import HTTPException
 from fastapi.responses import JSONResponse
 
-def exit_user(req: Request):
+def exit_user(req):
   token = req.cookies.get('token')
 
   if token:
