@@ -28,3 +28,4 @@ class EditItem(BaseModel):
   name: str = Field(min_length=2, max_length=40)
   desc: str = Field(min_length=20, max_length=1000)
   tags: list
+  price: int
