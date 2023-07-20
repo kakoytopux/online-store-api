@@ -1,36 +1,22 @@
-from fastapi import FastAPI, Depends, Request
-from routes.users import router as user_router
-from routes.items_admin import router as item_router_admin
-from routes.items import router as item_router
-from controllers.users import create_user
-from controllers.signin import auth_user
-from controllers.signout import exit_user
-from middlewares.validator import CreateUser, AuthUser
-from middlewares.auth import auth
-from middlewares.auth_admin import auth_admin
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 from dotenv import load_dotenv
+from routes.index import router as main_router
 import uvicorn
 
 load_dotenv()
 
 app = FastAPI()
 
-@app.post('/signup')
-def get_create_user(user: CreateUser):
-  return create_user(user)
+app.add_middleware(
+  CORSMiddleware,
+  allow_origins=['*'],
+  allow_credentials=True,
+  allow_methods=['*'],
+  allow_headers=['*'],  
+)
 
-@app.post('/signin')
-def get_auth_user(user: AuthUser):
-  return auth_user(user)
-
-@app.delete('/signout')
-def get_exit_user(req: Request):
-  return exit_user(req)
-
-app.include_router(user_router, prefix='/users', dependencies=[Depends(auth)])
-app.include_router(item_router, prefix='/items', dependencies=[Depends(auth)])
-app.include_router(item_router_admin, prefix='/items/admin',
-                   dependencies=[Depends(auth), Depends(auth_admin)])
+app.include_router(main_router)
 
 
 if __name__ == '__main__':

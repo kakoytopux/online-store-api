@@ -1,11 +1,7 @@
 from fastapi import APIRouter, Request
-from controllers.items import set_like_item, get_items_all, get_liked_items, delete_like_item
+from controllers.items import set_like_item, get_liked_items, delete_like_item
 
 router = APIRouter()
-
-@router.get('/')
-def get_items():
-  return get_items_all()
 
 @router.patch('/like/{id}')
 def get_item_like(req: Request, id: int):
