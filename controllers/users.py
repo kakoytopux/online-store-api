@@ -33,6 +33,7 @@ def create_user(user):
     json_res = jsonable_encoder(sql)
 
     del json_res['password']
+    del json_res['rank']
 
     return JSONResponse(content={ 'user': json_res }, status_code=201)
   except SQLAlchemyError as err:
@@ -53,6 +54,7 @@ def get_user_info(req):
     json_res = jsonable_encoder(user_obj)
 
     del json_res['password']
+    del json_res['rank']
 
     return JSONResponse(content={ 'user': json_res })
   except:
@@ -72,6 +74,7 @@ def change_user(req, user):
     json_res = jsonable_encoder(user_obj)
 
     del json_res['password']
+    del json_res['rank']
 
     return JSONResponse(content={ 'user': json_res })
   except SQLAlchemyError as err:
