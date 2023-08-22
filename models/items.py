@@ -12,7 +12,7 @@ class Items(Base):
   img_url: Mapped[str] = mapped_column(Text, nullable=False)
   name: Mapped[str] = mapped_column(String(40), nullable=False)
   desc: Mapped[str] = mapped_column(String(50), nullable=False)
-  tags: Mapped[str] = mapped_column(String(255), nullable=False)
+  tags: Mapped[str] = mapped_column(JSON, nullable=False, default={ 'tags': [] })
   price: Mapped[str] = mapped_column(String(8), nullable=False)
   likes: Mapped[str] = mapped_column(JSON, default={ 'users_id': [] })
   cart: Mapped[str] = mapped_column(JSON, default={ 'users_id': [] })

@@ -15,4 +15,4 @@ class Db:
   def get_session(self):
     return Session(bind=self.get_conn())
   
-db = Db('mysql+pymysql://root:root123@localhost/online_store')
+db = Db('mysql+pymysql://root:root@localhost/online_store')
