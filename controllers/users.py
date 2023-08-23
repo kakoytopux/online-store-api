@@ -16,6 +16,12 @@ def get_data(data):
   
   return data_obj
 
+def delValue(data):
+  del data['password']
+  del data['rank']
+
+  return data
+
 def create_user(user):
   session = db.get_session()
   data_obj = get_data(user)
@@ -30,10 +36,7 @@ def create_user(user):
     session.refresh(sql)
     session.close()
 
-    json_res = jsonable_encoder(sql)
-
-    del json_res['password']
-    del json_res['rank']
+    json_res = delValue(jsonable_encoder(sql))
 
     return JSONResponse(content={ 'user': json_res }, status_code=201)
   except SQLAlchemyError as err:
@@ -43,6 +46,8 @@ def create_user(user):
       raise HTTPException(detail={ 'message': 'Введены некорректные данные.' }, status_code=400)
     
     raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
+  except:
+    raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
   
 def get_user_info(req):
   session = db.get_session()
@@ -51,10 +56,7 @@ def get_user_info(req):
     user_obj = session.query(Users).get(req.state.user['id'])
     session.close()
 
-    json_res = jsonable_encoder(user_obj)
-
-    del json_res['password']
-    del json_res['rank']
+    json_res = delValue(jsonable_encoder(user_obj))
 
     return JSONResponse(content={ 'user': json_res })
   except:
@@ -71,10 +73,7 @@ def change_user(req, user):
     user_obj = session.query(Users).get(req.state.user['id'])
     session.close()
 
-    json_res = jsonable_encoder(user_obj)
-
-    del json_res['password']
-    del json_res['rank']
+    json_res = delValue(jsonable_encoder(user_obj))
 
     return JSONResponse(content={ 'user': json_res })
   except SQLAlchemyError as err:
@@ -83,4 +82,6 @@ def change_user(req, user):
     if(err.code == 'gkpj'):
       raise HTTPException(detail={ 'message': 'Такая почта уже используется.' }, status_code=409)
     
+    raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
+  except:
     raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
