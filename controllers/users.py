@@ -40,6 +40,8 @@ def create_user(user):
 
     return JSONResponse(content={ 'user': json_res }, status_code=201)
   except SQLAlchemyError as err:
+    session.rollback()
+    
     if(err.code == 'gkpj'):
       raise HTTPException(detail={ 'message': 'Такая почта уже используется.' }, status_code=409)
     if(err.code == '9h9h'):

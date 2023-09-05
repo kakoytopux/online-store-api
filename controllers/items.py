@@ -40,6 +40,8 @@ def set_like_item(req, id):
 
     return JSONResponse(content={ 'item': json_res })
   except:
+    session.rollback()
+
     raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
   
 def delete_like_item(req, id):
@@ -67,6 +69,8 @@ def delete_like_item(req, id):
 
     return JSONResponse(content={ 'item': json_res })
   except:
+    session.rollback()
+
     raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
 
 def get_liked_items(req):

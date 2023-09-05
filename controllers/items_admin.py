@@ -31,6 +31,8 @@ def create_item(data):
 
     return JSONResponse(content={ 'item': json_res })
   except:
+    session.rollback()
+
     raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
   
 def edit_item(data, id):
@@ -67,4 +69,6 @@ def delete_item(id):
 
     return JSONResponse(content={ 'item': json_res })
   except:
+    session.rollback()
+    
     raise HTTPException(detail={ 'message': 'Непредвиденная ошибка.' }, status_code=500)
